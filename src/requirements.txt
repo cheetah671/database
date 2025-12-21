@@ -1,0 +1,4 @@
+# Python dependencies for Mahabharat Database Project
+# Install with: pip3 install -r requirements.txt
+
+pymysql>=1.0.2
