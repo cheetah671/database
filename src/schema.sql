@@ -74,3 +74,57 @@ CREATE TABLE Vyuha (
     description TEXT,
     complexity_level INT NOT NULL CHECK (complexity_level >= 0)
 ) ENGINE=InnoDB;
+
+-- Battle: Major battles in the war
+CREATE TABLE Battle (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(150) NOT NULL UNIQUE,
+    date DATE,
+    victor_faction INT,
+    FOREIGN KEY (victor_faction) REFERENCES Faction(id)
+        ON DELETE SET NULL 
+        ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- Warrior: Main warrior/character table
+CREATE TABLE Warrior (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(120) NOT NULL UNIQUE,
+    age INT,
+    status ENUM('active', 'fallen', 'retired') NOT NULL DEFAULT 'active',
+    dob DATE,
+    classification VARCHAR(80),
+    title VARCHAR(80),
+    kingdom_id INT,
+    chariot_id INT,
+    FOREIGN KEY (kingdom_id) REFERENCES Kingdom(id)
+        ON DELETE SET NULL 
+        ON UPDATE CASCADE,
+    FOREIGN KEY (chariot_id) REFERENCES Chariot(id)
+        ON DELETE SET NULL 
+        ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- ============================================================================
+-- Boon and Curse System
+-- ============================================================================
+
+-- Boon_Curse_Details: Master table for boons/curses
+CREATE TABLE Boon_Curse_Details (
+    name VARCHAR(120) PRIMARY KEY,
+    type ENUM('boon', 'curse') NOT NULL,
+    description TEXT
+) ENGINE=InnoDB;
+
+-- Boon_Curse: Association between warriors and boons/curses
+CREATE TABLE Boon_Curse (
+    warrior_id INT NOT NULL,
+    name VARCHAR(120) NOT NULL,
+    PRIMARY KEY (warrior_id, name),
+    FOREIGN KEY (warrior_id) REFERENCES Warrior(id)
+        ON DELETE CASCADE 
+        ON UPDATE CASCADE,
+    FOREIGN KEY (name) REFERENCES Boon_Curse_Details(name)
+        ON DELETE CASCADE 
+        ON UPDATE CASCADE
+) ENGINE=InnoDB;
