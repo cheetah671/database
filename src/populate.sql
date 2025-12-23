@@ -82,3 +82,85 @@ INSERT INTO Vyuha (name, description, complexity_level) VALUES
 ('Makara Vyuha', 'Crocodile formation for aggressive assault', 5),
 ('Kurma Vyuha', 'Turtle formation for maximum defense', 4),
 ('Vajra Vyuha', 'Thunderbolt formation for concentrated attack', 7);
+
+-- ============================================================================
+-- Battles
+-- ============================================================================
+INSERT INTO Battle (name, date, victor_faction) VALUES
+('Kurukshetra Day 1', '3139-10-01', NULL),
+('Kurukshetra Day 2', '3139-10-02', NULL),
+('Kurukshetra Day 13', '3139-10-13', (SELECT id FROM Faction WHERE name='Kauravas')),
+('Kurukshetra Day 14', '3139-10-14', (SELECT id FROM Faction WHERE name='Pandavas')),
+('Kurukshetra Day 17', '3139-10-17', (SELECT id FROM Faction WHERE name='Pandavas')),
+('Kurukshetra Day 18', '3139-10-18', (SELECT id FROM Faction WHERE name='Pandavas')),
+('Virata War', '3138-03-15', (SELECT id FROM Faction WHERE name='Pandavas'));
+
+-- ============================================================================
+-- Warriors
+-- ============================================================================
+-- Note: DOB calculated from age 91 (Yudhishthira) = born 1934, age 16 (Abhimanyu) = born 2009
+-- This maintains proper age ordering: older warriors have earlier birth dates
+INSERT INTO Warrior (name, age, status, dob, classification, title, kingdom_id, chariot_id) VALUES
+-- Pandavas (in birth order: eldest to youngest)
+('Yudhishthira', 91, 'retired', '1934-07-15', 'Maharathi', 'Dharmaraja', 
+    (SELECT id FROM Kingdom WHERE name='Indraprastha'), NULL),
+('Bhima', 90, 'retired', '1935-05-22', 'Maharathi', 'Vrikodara', 
+    (SELECT id FROM Kingdom WHERE name='Indraprastha'), NULL),
+('Arjuna', 89, 'retired', '1936-03-18', 'Maharathi', 'Savyasachi', 
+    (SELECT id FROM Kingdom WHERE name='Indraprastha'), (SELECT id FROM Chariot WHERE name='Nandaka')),
+('Nakula', 88, 'retired', '1937-01-10', 'Atirathi', 'Sword Master', 
+    (SELECT id FROM Kingdom WHERE name='Indraprastha'), NULL),
+('Sahadeva', 88, 'retired', '1937-01-10', 'Atirathi', 'Astrologer Prince', 
+    (SELECT id FROM Kingdom WHERE name='Indraprastha'), NULL),
+
+-- Pandava Allies
+('Abhimanyu', 16, 'fallen', '2009-08-12', 'Atirathi', 'Young Warrior', 
+    (SELECT id FROM Kingdom WHERE name='Indraprastha'), (SELECT id FROM Chariot WHERE name='Devadatta')),
+('Dhrishtadyumna', 35, 'fallen', '1990-06-25', 'Maharathi', 'Commander', 
+    (SELECT id FROM Kingdom WHERE name='Panchala'), NULL),
+('Shikhandi', 40, 'retired', '1985-11-08', 'Atirathi', 'Bhishma Slayer', 
+    (SELECT id FROM Kingdom WHERE name='Panchala'), NULL),
+
+-- Kauravas (Duryodhana and Karna same age as Yudhishthira/older)
+('Duryodhana', 92, 'fallen', '1933-09-05', 'Maharathi', 'Crown Prince', 
+    (SELECT id FROM Kingdom WHERE name='Hastinapura'), (SELECT id FROM Chariot WHERE name='Sugriva')),
+('Dushasana', 90, 'fallen', '1935-02-14', 'Atirathi', 'Prince', 
+    (SELECT id FROM Kingdom WHERE name='Hastinapura'), NULL),
+('Karna', 92, 'fallen', '1933-06-01', 'Maharathi', 'Suryaputra', 
+    (SELECT id FROM Kingdom WHERE name='Anga'), (SELECT id FROM Chariot WHERE name='Vijaya')),
+
+-- Elders and Teachers (oldest warriors)
+('Bhishma', 150, 'fallen', '1875-12-21', 'Maharathi', 'Grandsire', 
+    (SELECT id FROM Kingdom WHERE name='Hastinapura'), NULL),
+('Drona', 85, 'fallen', '1940-04-30', 'Maharathi', 'Acharya', 
+    (SELECT id FROM Kingdom WHERE name='Hastinapura'), NULL),
+('Ashwatthama', 50, 'retired', '1975-10-18', 'Maharathi', 'Immortal Warrior', 
+    (SELECT id FROM Kingdom WHERE name='Hastinapura'), NULL),
+('Kripa', 100, 'retired', '1925-03-07', 'Atirathi', 'Royal Teacher', 
+    (SELECT id FROM Kingdom WHERE name='Hastinapura'), NULL);
+
+-- ============================================================================
+-- Boon and Curse Details
+-- ============================================================================
+INSERT INTO Boon_Curse_Details (name, type, description) VALUES
+('Kavach-Kundal', 'boon', 'Divine armor and earrings making warrior invincible'),
+('Immortality', 'boon', 'Cannot be killed by conventional means'),
+('Death-Choice', 'boon', 'Ability to choose the time of one\'s death'),
+('All-Weapon-Mastery', 'boon', 'Complete mastery over all weapons and astras'),
+('Brahma-Curse', 'curse', 'Cursed to forget knowledge at crucial moment'),
+('Single-Use-Limit', 'curse', 'Powerful weapon can only be used once'),
+('Chariot-Stuck', 'curse', 'Chariot wheel will be stuck in crucial battle'),
+('Truth-Bound', 'boon', 'Always speaks truth, cannot lie');
+
+-- ============================================================================
+-- Assign Boons and Curses to Warriors
+-- ============================================================================
+INSERT INTO Boon_Curse (warrior_id, name) VALUES
+((SELECT id FROM Warrior WHERE name='Karna'), 'Kavach-Kundal'),
+((SELECT id FROM Warrior WHERE name='Karna'), 'Brahma-Curse'),
+((SELECT id FROM Warrior WHERE name='Karna'), 'Chariot-Stuck'),
+((SELECT id FROM Warrior WHERE name='Ashwatthama'), 'Immortality'),
+((SELECT id FROM Warrior WHERE name='Bhishma'), 'Death-Choice'),
+((SELECT id FROM Warrior WHERE name='Arjuna'), 'All-Weapon-Mastery'),
+((SELECT id FROM Warrior WHERE name='Yudhishthira'), 'Truth-Bound'),
+((SELECT id FROM Warrior WHERE name='Karna'), 'Single-Use-Limit');
