@@ -164,3 +164,183 @@ INSERT INTO Boon_Curse (warrior_id, name) VALUES
 ((SELECT id FROM Warrior WHERE name='Arjuna'), 'All-Weapon-Mastery'),
 ((SELECT id FROM Warrior WHERE name='Yudhishthira'), 'Truth-Bound'),
 ((SELECT id FROM Warrior WHERE name='Karna'), 'Single-Use-Limit');
+
+-- ============================================================================
+-- Warrior-Astra Associations
+-- ============================================================================
+INSERT INTO Warrior_Astra (warrior_id, astra_id) VALUES
+-- Arjuna's astras
+((SELECT id FROM Warrior WHERE name='Arjuna'), (SELECT id FROM Astra WHERE name='Brahmastra')),
+((SELECT id FROM Warrior WHERE name='Arjuna'), (SELECT id FROM Astra WHERE name='Pashupatastra')),
+((SELECT id FROM Warrior WHERE name='Arjuna'), (SELECT id FROM Astra WHERE name='Agneyastra')),
+((SELECT id FROM Warrior WHERE name='Arjuna'), (SELECT id FROM Astra WHERE name='Varunastra')),
+((SELECT id FROM Warrior WHERE name='Arjuna'), (SELECT id FROM Astra WHERE name='Vayavastra')),
+
+-- Karna's astras
+((SELECT id FROM Warrior WHERE name='Karna'), (SELECT id FROM Astra WHERE name='Brahmastra')),
+((SELECT id FROM Warrior WHERE name='Karna'), (SELECT id FROM Astra WHERE name='Vasavi Shakti')),
+((SELECT id FROM Warrior WHERE name='Karna'), (SELECT id FROM Astra WHERE name='Agneyastra')),
+
+-- Bhishma's astras
+((SELECT id FROM Warrior WHERE name='Bhishma'), (SELECT id FROM Astra WHERE name='Brahmastra')),
+((SELECT id FROM Warrior WHERE name='Bhishma'), (SELECT id FROM Astra WHERE name='Vajra')),
+
+-- Drona's astras
+((SELECT id FROM Warrior WHERE name='Drona'), (SELECT id FROM Astra WHERE name='Brahmastra')),
+((SELECT id FROM Warrior WHERE name='Drona'), (SELECT id FROM Astra WHERE name='Narayanastra')),
+
+-- Ashwatthama's astras
+((SELECT id FROM Warrior WHERE name='Ashwatthama'), (SELECT id FROM Astra WHERE name='Brahmastra')),
+((SELECT id FROM Warrior WHERE name='Ashwatthama'), (SELECT id FROM Astra WHERE name='Narayanastra')),
+
+-- Abhimanyu's astras
+((SELECT id FROM Warrior WHERE name='Abhimanyu'), (SELECT id FROM Astra WHERE name='Agneyastra')),
+
+-- Bhima's astras
+((SELECT id FROM Warrior WHERE name='Bhima'), (SELECT id FROM Astra WHERE name='Vayavastra'));
+
+-- ============================================================================
+-- Commander Deploys Vyuha
+-- ============================================================================
+INSERT INTO Commander_Deploys_Vyuha (faction_id, vyuha_id, battle_id, commander_id) VALUES
+-- Day 13 - Chakravyuha by Kauravas
+((SELECT id FROM Faction WHERE name='Kauravas'), 
+ (SELECT id FROM Vyuha WHERE name='Chakravyuha'),
+ (SELECT id FROM Battle WHERE name='Kurukshetra Day 13'),
+ (SELECT id FROM Warrior WHERE name='Drona')),
+
+-- Day 14 - Padmavyuha by Pandavas
+((SELECT id FROM Faction WHERE name='Pandavas'),
+ (SELECT id FROM Vyuha WHERE name='Padmavyuha'),
+ (SELECT id FROM Battle WHERE name='Kurukshetra Day 14'),
+ (SELECT id FROM Warrior WHERE name='Dhrishtadyumna')),
+
+-- Day 1 - Vajra Vyuha by Kauravas
+((SELECT id FROM Faction WHERE name='Kauravas'),
+ (SELECT id FROM Vyuha WHERE name='Vajra Vyuha'),
+ (SELECT id FROM Battle WHERE name='Kurukshetra Day 1'),
+ (SELECT id FROM Warrior WHERE name='Bhishma')),
+
+-- Day 2 - Garudavyuha by Pandavas
+((SELECT id FROM Faction WHERE name='Pandavas'),
+ (SELECT id FROM Vyuha WHERE name='Garudavyuha'),
+ (SELECT id FROM Battle WHERE name='Kurukshetra Day 2'),
+ (SELECT id FROM Warrior WHERE name='Arjuna'));
+
+-- ============================================================================
+-- Uses Astra in Duel
+-- ============================================================================
+INSERT INTO Uses_Astra_In_Duel (attacker_id, defender_id, battle_id, astra_id) VALUES
+-- Arjuna vs Karna
+((SELECT id FROM Warrior WHERE name='Arjuna'),
+ (SELECT id FROM Warrior WHERE name='Karna'),
+ (SELECT id FROM Battle WHERE name='Kurukshetra Day 17'),
+ (SELECT id FROM Astra WHERE name='Agneyastra')),
+
+-- Karna vs Arjuna 
+((SELECT id FROM Warrior WHERE name='Karna'),
+ (SELECT id FROM Warrior WHERE name='Arjuna'),
+ (SELECT id FROM Battle WHERE name='Kurukshetra Day 17'),
+ (SELECT id FROM Astra WHERE name='Vasavi Shakti')),
+
+-- Drona vs Dhrishtadyumna
+((SELECT id FROM Warrior WHERE name='Drona'),
+ (SELECT id FROM Warrior WHERE name='Dhrishtadyumna'),
+ (SELECT id FROM Battle WHERE name='Kurukshetra Day 14'),
+ (SELECT id FROM Astra WHERE name='Brahmastra')),
+
+-- Ashwatthama uses Narayanastra
+((SELECT id FROM Warrior WHERE name='Ashwatthama'),
+ (SELECT id FROM Warrior WHERE name='Bhima'),
+ (SELECT id FROM Battle WHERE name='Kurukshetra Day 14'),
+ (SELECT id FROM Astra WHERE name='Narayanastra'));
+
+-- ============================================================================
+-- Warrior Skills
+-- ============================================================================
+INSERT INTO Warrior_Skills (warrior_id, skill_name) VALUES
+-- Arjuna
+((SELECT id FROM Warrior WHERE name='Arjuna'), 'Archery'),
+((SELECT id FROM Warrior WHERE name='Arjuna'), 'Chariot Warfare'),
+((SELECT id FROM Warrior WHERE name='Arjuna'), 'Sword Fighting'),
+((SELECT id FROM Warrior WHERE name='Arjuna'), 'Diplomacy'),
+
+-- Bhima
+((SELECT id FROM Warrior WHERE name='Bhima'), 'Mace Combat'),
+((SELECT id FROM Warrior WHERE name='Bhima'), 'Wrestling'),
+((SELECT id FROM Warrior WHERE name='Bhima'), 'Superhuman Strength'),
+
+-- Yudhishthira
+((SELECT id FROM Warrior WHERE name='Yudhishthira'), 'Spear Fighting'),
+((SELECT id FROM Warrior WHERE name='Yudhishthira'), 'Dharma Knowledge'),
+((SELECT id FROM Warrior WHERE name='Yudhishthira'), 'Governance'),
+
+-- Nakula
+((SELECT id FROM Warrior WHERE name='Nakula'), 'Sword Fighting'),
+((SELECT id FROM Warrior WHERE name='Nakula'), 'Horse Management'),
+
+-- Sahadeva
+((SELECT id FROM Warrior WHERE name='Sahadeva'), 'Astrology'),
+((SELECT id FROM Warrior WHERE name='Sahadeva'), 'Sword Fighting'),
+
+-- Karna
+((SELECT id FROM Warrior WHERE name='Karna'), 'Archery'),
+((SELECT id FROM Warrior WHERE name='Karna'), 'Chariot Warfare'),
+((SELECT id FROM Warrior WHERE name='Karna'), 'Spear Fighting'),
+
+-- Duryodhana
+((SELECT id FROM Warrior WHERE name='Duryodhana'), 'Mace Combat'),
+((SELECT id FROM Warrior WHERE name='Duryodhana'), 'Strategy'),
+
+-- Bhishma
+((SELECT id FROM Warrior WHERE name='Bhishma'), 'Archery'),
+((SELECT id FROM Warrior WHERE name='Bhishma'), 'All Weapons'),
+((SELECT id FROM Warrior WHERE name='Bhishma'), 'Military Strategy'),
+
+-- Drona
+((SELECT id FROM Warrior WHERE name='Drona'), 'Archery'),
+((SELECT id FROM Warrior WHERE name='Drona'), 'Teaching'),
+((SELECT id FROM Warrior WHERE name='Drona'), 'Astra Knowledge'),
+
+-- Abhimanyu
+((SELECT id FROM Warrior WHERE name='Abhimanyu'), 'Archery'),
+((SELECT id FROM Warrior WHERE name='Abhimanyu'), 'Chakravyuha Entry'),
+
+-- Ashwatthama
+((SELECT id FROM Warrior WHERE name='Ashwatthama'), 'Archery'),
+((SELECT id FROM Warrior WHERE name='Ashwatthama'), 'Divine Powers');
+
+-- ============================================================================
+-- Warrior Classifications (ISA Hierarchy)
+-- ============================================================================
+
+-- Maharathi (can fight 10,000 warriors simultaneously)
+INSERT INTO Maharathi (warrior_id, mastery_of_all_astras) VALUES
+((SELECT id FROM Warrior WHERE name='Arjuna'), TRUE),
+((SELECT id FROM Warrior WHERE name='Bhishma'), TRUE),
+((SELECT id FROM Warrior WHERE name='Drona'), TRUE),
+((SELECT id FROM Warrior WHERE name='Karna'), TRUE),
+((SELECT id FROM Warrior WHERE name='Ashwatthama'), TRUE),
+((SELECT id FROM Warrior WHERE name='Bhima'), FALSE),
+((SELECT id FROM Warrior WHERE name='Yudhishthira'), FALSE),
+((SELECT id FROM Warrior WHERE name='Duryodhana'), FALSE),
+((SELECT id FROM Warrior WHERE name='Dhrishtadyumna'), FALSE);
+
+-- Atirathi (can fight 10 warriors simultaneously)
+INSERT INTO Atirathi (warrior_id, chariot_combat_rating) VALUES
+((SELECT id FROM Warrior WHERE name='Nakula'), 8),
+((SELECT id FROM Warrior WHERE name='Sahadeva'), 8),
+((SELECT id FROM Warrior WHERE name='Abhimanyu'), 9),
+((SELECT id FROM Warrior WHERE name='Dushasana'), 7),
+((SELECT id FROM Warrior WHERE name='Shikhandi'), 7),
+((SELECT id FROM Warrior WHERE name='Kripa'), 8);
+
+-- Rathi (can fight 1 warrior)
+INSERT INTO Rathi (warrior_id) VALUES
+((SELECT id FROM Warrior WHERE name='Yudhishthira'));
+
+-- ============================================================================
+-- End of Data Population
+-- ============================================================================
+
+COMMIT;
