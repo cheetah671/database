@@ -293,3 +293,349 @@ def query7_faction_summary(connection):
     except pymysql.Error as e:
         print(f"Error executing query: {e}", file=sys.stderr)
 
+# ============================================================================
+# WRITE OPERATIONS (INSERT, UPDATE, DELETE)
+# ============================================================================
+
+def insert_new_warrior(connection):
+    """
+    INSERT Operation: Add a new warrior to the database
+    """
+    print_separator()
+    print("INSERT: Add New Warrior")
+    print_separator()
+    
+    name = input("Warrior name: ").strip()
+    age_input = input("Age (press Enter to skip): ").strip()
+    age = int(age_input) if age_input else None
+    
+    print("Status options: active, fallen, retired")
+    status = input("Status (default: active): ").strip() or 'active'
+    
+    dob_input = input("Date of birth (YYYY-MM-DD, press Enter to skip): ").strip()
+    dob = dob_input if dob_input else None
+    
+    classification = input("Classification (e.g., Maharathi, Atirathi): ").strip() or None
+    title = input("Title: ").strip() or None
+    
+    kingdom_name = input("Kingdom name (press Enter to skip): ").strip()
+    chariot_name = input("Chariot name (press Enter to skip): ").strip()
+    
+    try:
+        with connection.cursor() as cursor:
+            # Get kingdom_id if provided
+            kingdom_id = None
+            if kingdom_name:
+                cursor.execute("SELECT id FROM Kingdom WHERE name = %s", (kingdom_name,))
+                kingdom_row = cursor.fetchone()
+                if kingdom_row:
+                    kingdom_id = kingdom_row['id']
+                else:
+                    print(f"Warning: Kingdom '{kingdom_name}' not found. Setting NULL.")
+            
+            # Get chariot_id if provided
+            chariot_id = None
+            if chariot_name:
+                cursor.execute("SELECT id FROM Chariot WHERE name = %s", (chariot_name,))
+                chariot_row = cursor.fetchone()
+                if chariot_row:
+                    chariot_id = chariot_row['id']
+                else:
+                    print(f"Warning: Chariot '{chariot_name}' not found. Setting NULL.")
+            
+            # Insert warrior
+            sql = """
+                INSERT INTO Warrior (name, age, status, dob, classification, title, kingdom_id, chariot_id)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(sql, (name, age, status, dob, classification, title, kingdom_id, chariot_id))
+            connection.commit()
+            
+            print(f"\n✓ Successfully added warrior '{name}' (ID: {cursor.lastrowid})")
+            
+    except pymysql.IntegrityError as e:
+        connection.rollback()
+        print(f"✗ Error: Warrior with name '{name}' may already exist. {e}")
+    except pymysql.Error as e:
+        connection.rollback()
+        print(f"✗ Error inserting warrior: {e}", file=sys.stderr)
+
+
+def update_warrior_status(connection):
+    """
+    UPDATE Operation: Change a warrior's status
+    """
+    print_separator()
+    print("UPDATE: Change Warrior Status")
+    print_separator()
+    
+    warrior_name = input("Warrior name: ").strip()
+    
+    print("\nStatus options: active, fallen, retired")
+    new_status = input("New status: ").strip()
+    
+    if new_status not in ['active', 'fallen', 'retired']:
+        print("✗ Invalid status. Must be: active, fallen, or retired")
+        return
+    
+    try:
+        with connection.cursor() as cursor:
+            sql = "UPDATE Warrior SET status = %s WHERE name = %s"
+            cursor.execute(sql, (new_status, warrior_name))
+            
+            if cursor.rowcount == 0:
+                print(f"✗ No warrior found with name '{warrior_name}'")
+                connection.rollback()
+            else:
+                connection.commit()
+                print(f"✓ Successfully updated {warrior_name}'s status to '{new_status}'")
+                
+    except pymysql.Error as e:
+        connection.rollback()
+        print(f"✗ Error updating warrior: {e}", file=sys.stderr)
+
+
+def delete_warrior_skill(connection):
+    """
+    DELETE Operation: Remove a skill from a warrior
+    """
+    print_separator()
+    print("DELETE: Remove Warrior Skill")
+    print_separator()
+    
+    warrior_name = input("Warrior name: ").strip()
+    skill_name = input("Skill to remove: ").strip()
+    
+    try:
+        with connection.cursor() as cursor:
+            # First get warrior_id
+            cursor.execute("SELECT id FROM Warrior WHERE name = %s", (warrior_name,))
+            warrior = cursor.fetchone()
+            
+            if not warrior:
+                print(f"✗ Warrior '{warrior_name}' not found")
+                return
+            
+            warrior_id = warrior['id']
+            
+            # Delete the skill
+            sql = "DELETE FROM Warrior_Skills WHERE warrior_id = %s AND skill_name = %s"
+            cursor.execute(sql, (warrior_id, skill_name))
+            
+            if cursor.rowcount == 0:
+                print(f"✗ Skill '{skill_name}' not found for warrior '{warrior_name}'")
+                connection.rollback()
+            else:
+                connection.commit()
+                print(f"✓ Successfully removed skill '{skill_name}' from {warrior_name}")
+                
+    except pymysql.Error as e:
+        connection.rollback()
+        print(f"✗ Error deleting skill: {e}", file=sys.stderr)
+
+
+def insert_warrior_skill(connection):
+    """
+    INSERT Operation: Add a new skill to a warrior
+    """
+    print_separator()
+    print("INSERT: Add Warrior Skill")
+    print_separator()
+    
+    warrior_name = input("Warrior name: ").strip()
+    skill_name = input("Skill to add: ").strip()
+    
+    try:
+        with connection.cursor() as cursor:
+            # Get warrior_id
+            cursor.execute("SELECT id FROM Warrior WHERE name = %s", (warrior_name,))
+            warrior = cursor.fetchone()
+            
+            if not warrior:
+                print(f"✗ Warrior '{warrior_name}' not found")
+                return
+            
+            warrior_id = warrior['id']
+            
+            # Insert skill
+            sql = "INSERT INTO Warrior_Skills (warrior_id, skill_name) VALUES (%s, %s)"
+            cursor.execute(sql, (warrior_id, skill_name))
+            connection.commit()
+            
+            print(f"✓ Successfully added skill '{skill_name}' to {warrior_name}")
+            
+    except pymysql.IntegrityError:
+        connection.rollback()
+        print(f"✗ Skill '{skill_name}' already exists for {warrior_name}")
+    except pymysql.Error as e:
+        connection.rollback()
+        print(f"✗ Error adding skill: {e}", file=sys.stderr)
+
+
+def update_chariot_status(connection):
+    """
+    UPDATE Operation: Change chariot status
+    """
+    print_separator()
+    print("UPDATE: Change Chariot Status")
+    print_separator()
+    
+    chariot_name = input("Chariot name: ").strip()
+    
+    print("\nStatus options: active, destroyed, retired")
+    new_status = input("New status: ").strip()
+    
+    if new_status not in ['active', 'destroyed', 'retired']:
+        print("✗ Invalid status. Must be: active, destroyed, or retired")
+        return
+    
+    try:
+        with connection.cursor() as cursor:
+            sql = "UPDATE Chariot SET status = %s WHERE name = %s"
+            cursor.execute(sql, (new_status, chariot_name))
+            
+            if cursor.rowcount == 0:
+                print(f"✗ No chariot found with name '{chariot_name}'")
+                connection.rollback()
+            else:
+                connection.commit()
+                print(f"✓ Successfully updated {chariot_name}'s status to '{new_status}'")
+                
+    except pymysql.Error as e:
+        connection.rollback()
+        print(f"✗ Error updating chariot: {e}", file=sys.stderr)
+
+
+def delete_boon_curse(connection):
+    """
+    DELETE Operation: Remove a boon/curse from a warrior
+    """
+    print_separator()
+    print("DELETE: Remove Boon/Curse from Warrior")
+    print_separator()
+    
+    warrior_name = input("Warrior name: ").strip()
+    boon_curse_name = input("Boon/Curse name to remove: ").strip()
+    
+    try:
+        with connection.cursor() as cursor:
+            # Get warrior_id
+            cursor.execute("SELECT id FROM Warrior WHERE name = %s", (warrior_name,))
+            warrior = cursor.fetchone()
+            
+            if not warrior:
+                print(f"✗ Warrior '{warrior_name}' not found")
+                return
+            
+            warrior_id = warrior['id']
+            
+            # Delete the boon/curse
+            sql = "DELETE FROM Boon_Curse WHERE warrior_id = %s AND name = %s"
+            cursor.execute(sql, (warrior_id, boon_curse_name))
+            
+            if cursor.rowcount == 0:
+                print(f"✗ Boon/Curse '{boon_curse_name}' not found for {warrior_name}")
+                connection.rollback()
+            else:
+                connection.commit()
+                print(f"✓ Successfully removed '{boon_curse_name}' from {warrior_name}")
+                
+    except pymysql.Error as e:
+        connection.rollback()
+        print(f"✗ Error deleting boon/curse: {e}", file=sys.stderr)
+
+
+# ============================================================================
+# MAIN CLI
+# ============================================================================
+
+def main_cli(connection):
+    """The main command-line interface loop."""
+    try:
+        while True:
+            print_separator()
+            print("     MAHABHARAT MINI-WORLD DATABASE")
+            print_separator()
+            print("\n📖 READ OPERATIONS (Queries):")
+            print("  1. List warriors by kingdom")
+            print("  2. Show warrior's astras (divine weapons)")
+            print("  3. Show battle formations (vyuhas) deployed")
+            print("  4. Show astra usage in duels")
+            print("  5. List Maharathi warriors (elite class)")
+            print("  6. Show warrior skills")
+            print("  7. Show faction summary")
+            
+            print("\n✏️  WRITE OPERATIONS:")
+            print("  8. INSERT: Add new warrior")
+            print("  9. INSERT: Add skill to warrior")
+            print(" 10. UPDATE: Change warrior status")
+            print(" 11. UPDATE: Change chariot status")
+            print(" 12. DELETE: Remove warrior skill")
+            print(" 13. DELETE: Remove boon/curse from warrior")
+            
+            print("\n  q. Quit")
+            print_separator()
+            
+            choice = input("\nEnter your choice: ").strip().lower()
+            
+            if choice == '1':
+                query1_warriors_by_kingdom(connection)
+            elif choice == '2':
+                query2_warrior_astras(connection)
+            elif choice == '3':
+                query3_battle_formations(connection)
+            elif choice == '4':
+                query4_astra_duels(connection)
+            elif choice == '5':
+                query5_maharathi_warriors(connection)
+            elif choice == '6':
+                query6_warrior_skills(connection)
+            elif choice == '7':
+                query7_faction_summary(connection)
+            elif choice == '8':
+                insert_new_warrior(connection)
+            elif choice == '9':
+                insert_warrior_skill(connection)
+            elif choice == '10':
+                update_warrior_status(connection)
+            elif choice == '11':
+                update_chariot_status(connection)
+            elif choice == '12':
+                delete_warrior_skill(connection)
+            elif choice == '13':
+                delete_boon_curse(connection)
+            elif choice == 'q':
+                print("\n👋 Exiting application. Thank you!")
+                break
+            else:
+                print("✗ Invalid choice. Please try again.")
+                
+    finally:
+        if connection:
+            connection.close()
+            print("✓ Database connection closed.")
+
+
+if __name__ == "__main__":
+    DB_HOST = 'localhost'
+    DB_NAME = 'mahabharat_db'
+    
+    print_separator()
+    print("     MAHABHARAT DATABASE - PHASE 4")
+    print_separator()
+    
+    # Default credentials for demonstration
+    DB_USER = "root"
+    DB_PASS = "Manik69*"
+    
+    print("\nConnecting to database with default credentials...")
+    
+    db_conn = get_db_connection(DB_USER, DB_PASS, DB_HOST, DB_NAME)
+    
+    if db_conn:
+        main_cli(db_conn)
+    else:
+        print("✗ Failed to connect to the database. Application will exit.")
+        sys.exit(1)
+
+
