@@ -1068,11 +1068,3 @@ This project successfully implements a complete database system for the Mahabhar
 - **Professional CLI interface** for easy interaction
 
 All functional requirements have been met and demonstrated through both the Python application and raw SQL verification queries.
-
----
-
-**Good Luck with Your Phase 4 Submission! 🎯**
-
----
-
-*Last Updated: November 22, 2025*
